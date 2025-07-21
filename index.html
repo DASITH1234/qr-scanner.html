@@ -22,12 +22,26 @@
     }
     #result {
       margin-top: 20px;
-      font-size: 1.3rem;
+      font-size: 1.2rem;
       color: green;
       word-wrap: break-word;
+      white-space: pre-wrap;
     }
     #history {
       margin-top: 30px;
+      text-align: left;
+      max-width: 600px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    .scanned-item {
+      background-color: #fff;
+      padding: 10px;
+      border-radius: 8px;
+      margin-bottom: 15px;
+      box-shadow: 0 0 5px rgba(0,0,0,0.1);
+      word-wrap: break-word;
+      white-space: pre-wrap;
       font-size: 1rem;
       color: #333;
     }
@@ -36,36 +50,39 @@
 <body>
 
   <h1>🏛️ Museum QR Scanner</h1>
-  <p>Scan a QR code to see exhibit details below</p>
+  <p>Scan a QR code to view its full details below</p>
 
   <div id="reader"></div>
-  <div id="result">Waiting for scan...</div>
+  <div id="result"><strong>Waiting for scan...</strong></div>
 
   <div id="history">
-    <h3>🔍 Scanned Items:</h3>
-    <ul id="scannedList"></ul>
+    <h3>🔍 Scan History:</h3>
+    <div id="scannedList"></div>
   </div>
 
-  <!-- Include QR Scanner Library -->
+  <!-- QR Scanner Library -->
   <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
 
   <script>
     let lastScanned = "";
 
     function onScanSuccess(decodedText, decodedResult) {
-      if (decodedText === lastScanned) return; // Avoid repeat
+      if (decodedText === lastScanned) return;
       lastScanned = decodedText;
 
-      document.getElementById('result').innerText = `✅ Latest Scan: ${decodedText}`;
+      // Display latest result at top
+      document.getElementById('result').innerHTML = `<strong>✅ Latest Scan:</strong><br>${decodedText}`;
 
-      // Add to scanned list
-      const li = document.createElement("li");
-      li.innerText = decodedText;
-      document.getElementById("scannedList").appendChild(li);
+      // Create new paragraph block
+      const para = document.createElement("div");
+      para.className = "scanned-item";
+      para.innerText = decodedText;
+
+      document.getElementById("scannedList").prepend(para); // newest on top
     }
 
     function onScanError(errorMessage) {
-      // Optional: show error or keep quiet
+      // Optionally ignore
     }
 
     const html5QrCode = new Html5Qrcode("reader");
