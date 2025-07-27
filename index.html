@@ -1,88 +1,28 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Museum QR Scanner</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      text-align: center;
-      background-color: #f0f0f0;
-      padding: 20px;
-    }
-    #reader {
-      width: 100%;
-      max-width: 500px;
-      margin: auto;
-      border: 2px solid #444;
-      border-radius: 10px;
-      padding: 10px;
-      background-color: #fff;
-    }
-    #result {
-      margin-top: 20px;
-      font-size: 1.2rem;
-      color: green;
-      word-wrap: break-word;
-      white-space: pre-wrap;
-    }
-    #history {
-      margin-top: 30px;
-      text-align: left;
-      max-width: 600px;
-      margin-left: auto;
-      margin-right: auto;
-    }
-    .scanned-item {
-      background-color: #fff;
-      padding: 10px;
-      border-radius: 8px;
-      margin-bottom: 15px;
-      box-shadow: 0 0 5px rgba(0,0,0,0.1);
-      word-wrap: break-word;
-      white-space: pre-wrap;
-      font-size: 1rem;
-      color: #333;
-    }
-  </style>
+  <title>Museum QR Audio Player</title>
+  <script src="https://unpkg.com/html5-qrcode"></script>
 </head>
 <body>
-
-  <h1>🏛️ Museum QR Scanner</h1>
-  <p>Scan a QR code to view its full details below</p>
-
-  <div id="reader"></div>
-  <div id="result"><strong>Waiting for scan...</strong></div>
-
-  <div id="history">
-    <h3>🔍 Scan History:</h3>
-    <div id="scannedList"></div>
-  </div>
-
-  <!-- QR Scanner Library -->
-  <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
+  <h2>Scan QR to Play Audio</h2>
+  <div id="reader" style="width:300px;"></div>
+  <audio id="audioPlayer" controls autoplay style="margin-top: 20px;"></audio>
 
   <script>
-    let lastScanned = "";
+    function onScanSuccess(qrCodeMessage) {
+      console.log("Scanned content:", qrCodeMessage);
 
-    function onScanSuccess(decodedText, decodedResult) {
-      if (decodedText === lastScanned) return;
-      lastScanned = decodedText;
+      // If the scanned QR code is just a filename like "Venus.mp3"
+      let audioSrc = qrCodeMessage;
+      if (!qrCodeMessage.startsWith("http")) {
+        audioSrc = `https://dasith1234.github.io/assets/audio/${qrCodeMessage}`;
+      }
 
-      // Display latest result at top
-      document.getElementById('result').innerHTML = `<strong>✅ Latest Scan:</strong><br>${decodedText}`;
-
-      // Create new paragraph block
-      const para = document.createElement("div");
-      para.className = "scanned-item";
-      para.innerText = decodedText;
-
-      document.getElementById("scannedList").prepend(para); // newest on top
-    }
-
-    function onScanError(errorMessage) {
-      // Optionally ignore
+      // Play the audio
+      const player = document.getElementById("audioPlayer");
+      player.src = audioSrc;
+      player.play();
     }
 
     const html5QrCode = new Html5Qrcode("reader");
@@ -90,14 +30,10 @@
       { facingMode: "environment" },
       {
         fps: 10,
-        qrbox: { width: 250, height: 250 }
+        qrbox: 250
       },
-      onScanSuccess,
-      onScanError
-    ).catch(err => {
-      document.getElementById('result').innerText = `❌ Camera Error: ${err}`;
-    });
+      onScanSuccess
+    );
   </script>
-
 </body>
 </html>
