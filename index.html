@@ -3,100 +3,210 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Museum QR Scanner</title>
+  <title>Museum QR SCANNER</title>
   <style>
     body {
-      font-family: Arial, sans-serif;
+      margin: 0;
+      font-family: 'Segoe UI', Tahoma, sans-serif;
+      background: #fdfdfd;
+      color: #333;
       text-align: center;
-      background-color: #f0f0f0;
-      padding: 20px;
+    }
+    /* Hero Section */
+    header {
+      background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)),
+                  url("museum-banner.jpg") center/cover no-repeat;
+      color: white;
+      padding: 60px 20px;
+    }
+    header h1 {
+      font-size: 2.8rem;
+      margin: 0 0 15px;
+      animation: fadeInDown 1s ease-out;
+    }
+    header p {
+      font-size: 1.2rem;
+      max-width: 600px;
+      margin: auto;
+      animation: fadeInUp 1.2s ease-out;
+    }
+    /* Scanner Box */
+    #scanner-section {
+      margin-top: -30px;
+      padding: 30px 20px;
     }
     #reader {
       width: 100%;
       max-width: 500px;
       margin: auto;
-      border: 2px solid #444;
-      border-radius: 10px;
-      padding: 10px;
+      border: 4px solid #0077b6;
+      border-radius: 15px;
+      padding: 15px;
       background-color: #fff;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+      animation: zoomIn 0.6s ease;
     }
     #result {
       margin-top: 20px;
       font-size: 1.2rem;
-      color: green;
-      word-wrap: break-word;
-      white-space: pre-wrap;
+      color: #0077b6;
+      font-weight: bold;
     }
-    #history {
-      margin-top: 30px;
-      text-align: left;
+    /* Artifact Card */
+    #artifact {
+      display: none;
+      margin: 40px auto;
+      background: white;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.15);
       max-width: 600px;
-      margin-left: auto;
-      margin-right: auto;
+      text-align: left;
+      animation: fadeIn 1s ease;
     }
-    .scanned-item {
-      background-color: #fff;
-      padding: 10px;
-      border-radius: 8px;
+    #artifact img {
+      width: 100%;
+      border-radius: 10px;
       margin-bottom: 15px;
-      box-shadow: 0 0 5px rgba(0,0,0,0.1);
-      word-wrap: break-word;
-      white-space: pre-wrap;
-      font-size: 1rem;
-      color: #333;
+    }
+    audio {
+      width: 100%;
+      margin-top: 10px;
+    }
+    /* Footer */
+    footer {
+      margin-top: 50px;
+      background: #222;
+      color: #ccc;
+      padding: 15px;
+      font-size: 0.9rem;
+    }
+    /* Animations */
+    @keyframes fadeInDown {
+      from { opacity: 0; transform: translateY(-30px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(30px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes zoomIn {
+      from { transform: scale(0.9); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
     }
   </style>
 </head>
 <body>
 
-  <h1>🏛️ Museum QR Scanner</h1>
-  <p>Scan a QR code to view its full details below</p>
+  <!-- Hero Header -->
+  <header>
+    <h1>🏛️ Welcome to the Museum</h1>
+    <p>Scan QR codes near artifacts to unlock their history and listen to their stories.</p>
+  </header>
 
-  <div id="reader"></div>
-  <div id="result"><strong>Waiting for scan...</strong></div>
+  <!-- Scanner -->
+  <section id="scanner-section">
+    <div id="reader"></div>
+    <div id="result">📷 Point your camera at a QR code...</div>
+  </section>
 
-  <div id="history">
-    <h3>🔍 Scan History:</h3>
-    <div id="scannedList"></div>
+  <!-- Artifact Info -->
+  <div id="artifact">
+    <h2 id="artifact-title"></h2>
+    <img id="artifact-image" src="" alt="Artifact Image">
+    <p id="artifact-description"></p>
+    <audio controls id="artifact-audio">
+      <source id="audio-source" src="" type="audio/mpeg">
+      Your browser does not support audio playback.
+    </audio>
   </div>
+
+  <!-- Footer -->
+  <footer>
+    © 2025 Virtual Museum Experience | Designed for Interactive Learning
+  </footer>
 
   <!-- QR Scanner Library -->
   <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
 
   <script>
+    // Artifact database
+    const artifacts = {
+      "1": {
+        title: "Venus of Willendorf",
+        description: "Nearly 30,000 years old, Venus of Willendorf is the female icon of the Ice Age.",
+        image: "venus.jpg",
+        audio: "venus.mp3"
+      },
+      "2": {
+        title: "Rosetta Stone",
+        description: "The Rosetta Stone helped scholars crack Egyptian hieroglyphs.",
+        image: "rosetta.jpg",
+        audio: "rosetta.mp3"
+      },
+      "3": {
+        title: "Terracotta Warrior",
+        description: "One of thousands of life-sized warriors buried with China's first emperor.",
+        image: "terracotta.jpg",
+        audio: "terracotta.mp3"
+      }
+    };
+
     let lastScanned = "";
 
-    function onScanSuccess(decodedText, decodedResult) {
+    function onScanSuccess(decodedText) {
       if (decodedText === lastScanned) return;
       lastScanned = decodedText;
 
-      // Display latest result at top
-      document.getElementById('result').innerHTML = `<strong>✅ Latest Scan:</strong><br>${decodedText}`;
+      document.getElementById('result').innerHTML =
+        `✅ QR Scanned: <br>${decodedText}`;
 
-      // Create new paragraph block
-      const para = document.createElement("div");
-      para.className = "scanned-item";
-      para.innerText = decodedText;
+      try {
+        const url = new URL(decodedText);
+        const id = url.searchParams.get("id");
 
-      document.getElementById("scannedList").prepend(para); // newest on top
+        if (id && artifacts[id]) {
+          showArtifact(artifacts[id]);
+        } else {
+          alert("❌ Artifact not found");
+        }
+      } catch {
+        alert("❌ Invalid QR code format");
+      }
     }
 
     function onScanError(errorMessage) {
-      // Optionally ignore
+      // ignore scan errors
     }
 
     const html5QrCode = new Html5Qrcode("reader");
     html5QrCode.start(
       { facingMode: "environment" },
-      {
-        fps: 10,
-        qrbox: { width: 250, height: 250 }
-      },
+      { fps: 10, qrbox: { width: 250, height: 250 } },
       onScanSuccess,
       onScanError
     ).catch(err => {
       document.getElementById('result').innerText = `❌ Camera Error: ${err}`;
     });
+
+    // Show artifact info
+    function showArtifact(artifact) {
+      document.getElementById("artifact-title").textContent = artifact.title;
+      document.getElementById("artifact-image").src = artifact.image;
+      document.getElementById("artifact-description").textContent = artifact.description;
+      document.getElementById("audio-source").src = artifact.audio;
+
+      const audio = document.getElementById("artifact-audio");
+      audio.load();
+      audio.play().catch(() => console.log("🔇 Autoplay blocked"));
+
+      document.getElementById("artifact").style.display = "block";
+      document.getElementById("artifact").scrollIntoView({ behavior: "smooth" });
+    }
   </script>
 
 </body>
