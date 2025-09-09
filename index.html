@@ -73,7 +73,9 @@
       // Stop scanner after first scan
       html5QrCode.stop().then(() => {
         document.getElementById("reader").style.display = "none";
-        document.getElementById("pdf-frame").src = decodedText; // Load PDF link into iframe
+        // Use Google Drive 'preview' link to display PDF
+        const previewLink = decodedText.replace("/view?usp=sharing", "/preview");
+        document.getElementById("pdf-frame").src = previewLink;
         document.getElementById("result-box").style.display = "block";
       }).catch(err => console.error("Stop error: ", err));
     }
