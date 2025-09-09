@@ -25,12 +25,13 @@
       text-align: left;
       max-width: 800px;
       margin: 20px auto;
+      overflow-y: auto;
+      max-height: 600px;
     }
-    iframe {
-      width: 100%;
-      height: 600px;
-      border: none;
-      border-radius: 12px;
+    #result-box p {
+      line-height: 1.6;
+      font-size: 1rem;
+      white-space: pre-wrap; /* preserve line breaks from QR content */
     }
     button {
       margin-top: 20px;
@@ -58,8 +59,7 @@
   <!-- Result Display -->
   <div id="result-box">
     <h2>Artifact Info</h2>
-    <!-- PDF will be embedded here -->
-    <iframe id="pdf-frame" src=""></iframe>
+    <p id="result-text"></p>
     <button onclick="showScanner()">🔄 Scan Another QR</button>
   </div>
 
@@ -70,12 +70,9 @@
     let html5QrCode;
 
     function onScanSuccess(decodedText) {
-      // Stop scanner after first scan
       html5QrCode.stop().then(() => {
         document.getElementById("reader").style.display = "none";
-        // Use Google Drive 'preview' link to display PDF
-        const previewLink = decodedText.replace("/view?usp=sharing", "/preview");
-        document.getElementById("pdf-frame").src = previewLink;
+        document.getElementById("result-text").innerText = decodedText; // show QR content
         document.getElementById("result-box").style.display = "block";
       }).catch(err => console.error("Stop error: ", err));
     }
@@ -91,9 +88,7 @@
         { fps: 10, qrbox: { width: 250, height: 250 } },
         onScanSuccess,
         onScanError
-      ).catch(err => {
-        console.error("Camera error: ", err);
-      });
+      ).catch(err => console.error("Camera error: ", err));
     }
 
     function showScanner() {
