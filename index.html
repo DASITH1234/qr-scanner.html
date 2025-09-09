@@ -23,12 +23,14 @@
       border-radius: 12px;
       box-shadow: 0 4px 10px rgba(0,0,0,0.2);
       text-align: left;
-      max-width: 600px;
+      max-width: 800px;
       margin: 20px auto;
     }
-    #result-box p {
-      font-size: 1.1rem;
-      line-height: 1.6;
+    iframe {
+      width: 100%;
+      height: 600px;
+      border: none;
+      border-radius: 12px;
     }
     button {
       margin-top: 20px;
@@ -56,7 +58,8 @@
   <!-- Result Display -->
   <div id="result-box">
     <h2>Artifact Info</h2>
-    <p id="result-text"></p>
+    <!-- PDF will be embedded here -->
+    <iframe id="pdf-frame" src=""></iframe>
     <button onclick="showScanner()">🔄 Scan Another QR</button>
   </div>
 
@@ -70,7 +73,7 @@
       // Stop scanner after first scan
       html5QrCode.stop().then(() => {
         document.getElementById("reader").style.display = "none";
-        document.getElementById("result-text").innerText = decodedText;
+        document.getElementById("pdf-frame").src = decodedText; // Load PDF link into iframe
         document.getElementById("result-box").style.display = "block";
       }).catch(err => console.error("Stop error: ", err));
     }
